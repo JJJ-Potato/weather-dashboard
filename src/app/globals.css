@@ -1,20 +1,83 @@
 @import "tailwindcss";
 
+/* ── 배경 ── */
 body {
-  background: linear-gradient(135deg, #e0f0ff 0%, #f0f7ff 50%, #dce8f5 100%);
+  background: linear-gradient(160deg, #c9e8ff 0%, #dff0ff 30%, #e8f4ff 60%, #cfe3f7 100%);
   min-height: 100vh;
   color: #1e293b;
 }
 
-.glass-card {
-  background: rgba(255, 255, 255, 0.65);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.4);
-  border-radius: 16px;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+/* 배경 장식 orb */
+body::before,
+body::after {
+  content: '';
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.35;
+  pointer-events: none;
+  z-index: 0;
+}
+body::before {
+  width: 520px;
+  height: 520px;
+  background: radial-gradient(circle, #93c5fd, #60a5fa);
+  top: -120px;
+  right: -100px;
+}
+body::after {
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, #bae6fd, #a5f3fc);
+  bottom: -80px;
+  left: -80px;
 }
 
+/* 모든 컨텐츠가 orb 위에 오도록 */
+main, header, footer {
+  position: relative;
+  z-index: 1;
+}
+
+/* ── 글래스모피즘 카드 ── */
+.glass-card {
+  background: rgba(255, 255, 255, 0.58);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  border-radius: 20px;
+  box-shadow:
+    0 8px 32px rgba(100, 160, 220, 0.12),
+    0 2px 8px rgba(100, 160, 220, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+.glass-card:hover {
+  box-shadow:
+    0 12px 40px rgba(100, 160, 220, 0.18),
+    0 4px 12px rgba(100, 160, 220, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  transform: translateY(-2px);
+}
+
+/* ── 헤더 글래스 ── */
+.glass-header {
+  background: rgba(255, 255, 255, 0.50);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.70);
+  border-radius: 24px;
+  box-shadow:
+    0 8px 32px rgba(100, 160, 220, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.85);
+}
+
+/* ── 숫자 정렬 ── */
 .tabular-nums {
   font-variant-numeric: tabular-nums;
+}
+
+/* ── 테이블 행 hover ── */
+.weather-row:hover td {
+  background: rgba(219, 234, 254, 0.35);
 }
