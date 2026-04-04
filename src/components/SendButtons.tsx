@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { DashboardData, WeatherAlert } from '@/types/weather';
+import { formatDailyForecast } from '@/lib/message-formatter';
 
 interface Props {
   weatherData: DashboardData | null;
@@ -14,7 +15,6 @@ interface Toast {
 }
 
 export default function SendButtons({ weatherData, alerts }: Props) {
-  const [bandLoading, setBandLoading] = useState(false);
   const [telegramLoading, setTelegramLoading] = useState(false);
   const [toast, setToast] = useState<Toast | null>(null);
 
@@ -23,26 +23,11 @@ export default function SendButtons({ weatherData, alerts }: Props) {
     setTimeout(() => setToast(null), 3000);
   }
 
-  async function handleBand() {
+  function handleBand() {
     if (!weatherData) return;
-    setBandLoading(true);
-    try {
-      const res = await fetch('/api/send-band', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ weatherData, alerts }),
-      });
-      const data = await res.json();
-      if (data.shareUrl) {
-        window.open(data.shareUrl, '_blank');
-      } else {
-        showToast('밴드 공유 URL 생성 실패', 'error');
-      }
-    } catch {
-      showToast('밴드 발송 중 오류가 발생했습니다', 'error');
-    } finally {
-      setBandLoading(false);
-    }
+    const text = formatDailyForecast(weatherData, alerts);
+    const shareUrl = `https://band.us/plugin/share?body=${encodeURIComponent(text)}`;
+    window.open(shareUrl, '_blank');
   }
 
   async function handleTelegram() {
@@ -74,10 +59,10 @@ export default function SendButtons({ weatherData, alerts }: Props) {
       <div className="flex gap-3 justify-center py-4">
         <button
           onClick={handleBand}
-          disabled={disabled || bandLoading}
+          disabled={disabled}
           className="bg-green-500 hover:bg-green-600 disabled:bg-green-300 text-white rounded-xl px-6 py-3 font-medium transition-colors text-sm"
         >
-          {bandLoading ? '발송 중...' : '📢 밴드 발송'}
+          📢 밴드 발송
         </button>
         <button
           onClick={handleTelegram}
