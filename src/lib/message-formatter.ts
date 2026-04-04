@@ -1,42 +1,56 @@
-import { DashboardData, WeatherAlert } from '@/types/weather';
+import { DashboardData, HourlyForecast, WeatherAlert } from '@/types/weather';
 import { getWeatherIcon, parsePcp } from './weather-utils';
 
-function formatDateLabel(baseDate: string, isNextDay: boolean): string {
-  const y = baseDate.slice(0, 4);
+function formatDateHeader(baseDate: string, isNextDay: boolean): string {
   const m = parseInt(baseDate.slice(4, 6));
   const d = parseInt(baseDate.slice(6, 8));
   const DAYS = ['일', '월', '화', '수', '목', '금', '토'];
-  const dateObj = new Date(parseInt(y), m - 1, d);
+  const dateObj = new Date(parseInt(baseDate.slice(0, 4)), m - 1, d);
   const day = DAYS[dateObj.getDay()];
-  const label = isNextDay ? '내일' : '당일';
-  return `${y}년 ${m}월 ${d}일(${day}) ${label} 예보`;
+  const label = isNextDay ? '내일' : `${m}월 ${d}일(${day})`;
+  return `${label} 예보 보고드립니다.`;
+}
+
+function formatRainSummary(forecasts: HourlyForecast[]): string {
+  const rainy = forecasts.filter(fc => fc.pty > 0 || (fc.pcp && fc.pcp !== '강수없음'));
+  if (rainy.length === 0) return '☀️ 비 예보는 없습니다.';
+
+  const timeLabels = rainy.map(fc => `${parseInt(fc.time.slice(0, 2))}시`);
+  const amounts = rainy.map(fc => parsePcp(fc.pcp)).filter(p => p !== '-');
+
+  const timePart = timeLabels.join(', ');
+  const amountPart = amounts.length > 0
+    ? `(${rainy.length > 1 ? '각 ' : ''}${amounts.join(', ')})`
+    : '';
+
+  return `🌧 ${timePart}에 비 소식이 있습니다.${amountPart ? ' ' + amountPart : ''}`;
 }
 
 export function formatDailyForecast(data: DashboardData, alerts: WeatherAlert[]): string {
   const lines: string[] = [];
 
-  lines.push('📋 수도권 제2순환선(양평-이천) 현장 날씨');
-  lines.push(`📅 ${formatDateLabel(data.baseDate, data.isNextDay)}`);
+  lines.push(formatDateHeader(data.baseDate, data.isNextDay));
 
   if (alerts.length > 0) {
     lines.push('');
     for (const alert of alerts) {
-      lines.push(`⚠️ [기상특보] ${alert.title} - ${alert.region}`);
+      lines.push(`[기상특보] ${alert.title} - ${alert.region}`);
     }
   }
 
   for (const region of data.regions) {
+    if (region.regionId !== 'gonjiam' && region.regionId !== 'sanbuk') continue;
+
     lines.push('');
-    lines.push(`📍 ${region.regionName} (${region.sections})`);
+    lines.push(`[${region.regionName}]`);
+    lines.push(formatRainSummary(region.forecasts));
 
     for (const fc of region.forecasts) {
       const { alt } = getWeatherIcon(fc.sky, fc.pty);
-      const hour = `${fc.time.slice(0, 2)}시`;
+      const hour = `${fc.time.slice(0, 2)}:00`;
       const pcp = parsePcp(fc.pcp);
-      const pcpPart = pcp !== '-' ? ` 🌧${pcp}` : '';
-      lines.push(
-        `  ${hour} ${alt} ${fc.tmp}°C 💧${fc.pop}%${pcpPart} 습도${fc.reh}%`
-      );
+      const pcpPart = pcp !== '-' ? `  💧예상강수량 ${pcp}` : '';
+      lines.push(`  ${hour}  ${alt}  기온 ${fc.tmp}°C${pcpPart}`);
     }
   }
 
