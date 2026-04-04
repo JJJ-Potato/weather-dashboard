@@ -2,13 +2,17 @@ import { DashboardData, HourlyForecast, WeatherAlert } from '@/types/weather';
 import { getWeatherIcon, parsePcp } from './weather-utils';
 
 function formatDateHeader(baseDate: string, isNextDay: boolean): string {
+  const y = parseInt(baseDate.slice(0, 4));
   const m = parseInt(baseDate.slice(4, 6));
   const d = parseInt(baseDate.slice(6, 8));
   const DAYS = ['일', '월', '화', '수', '목', '금', '토'];
-  const dateObj = new Date(parseInt(baseDate.slice(0, 4)), m - 1, d);
+  const dateObj = new Date(y, m - 1, d);
+  if (isNextDay) dateObj.setDate(dateObj.getDate() + 1);
   const day = DAYS[dateObj.getDay()];
-  const label = isNextDay ? '내일' : `${m}월 ${d}일(${day})`;
-  return `${label} 예보 보고드립니다.`;
+  const fy = dateObj.getFullYear();
+  const fm = dateObj.getMonth() + 1;
+  const fd = dateObj.getDate();
+  return `${fy}년 ${fm}월 ${fd}일(${day}) 날씨 예보 보고드립니다.`;
 }
 
 function formatRainSummary(forecasts: HourlyForecast[]): string {
