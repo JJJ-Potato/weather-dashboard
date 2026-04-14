@@ -45,9 +45,9 @@ function formatDateLabel(dateStr: string): string {
   return `${m}/${d}(${day})`;
 }
 
-const LABEL_STYLE = 'py-2 text-xs font-semibold text-slate-400 text-left pl-2 sticky left-0 bg-white/90 backdrop-blur-sm z-10';
-const CELL_TODAY = 'py-2 text-center';
-const CELL_FUTURE = 'py-2 text-center bg-slate-50/60';
+const LABEL_STYLE = 'py-2 text-xs font-semibold text-slate-400 text-left pl-2 sticky left-0 bg-white z-10';
+const CELL_TODAY = 'py-2 text-center bg-white';
+const CELL_FUTURE = 'py-2 text-center bg-slate-50';
 const ROW_BASE = 'border-b border-slate-100/70 last:border-0';
 
 // 날짜 구분 divider 셀
@@ -94,7 +94,7 @@ export default function WeatherTable({ days }: Props) {
             {/* 오늘 */}
             <td
               colSpan={TODAY_HOURS.length}
-              className="text-center py-1.5 bg-sky-50/60"
+              className="text-center py-1.5 bg-sky-50"
             >
               <span className="text-xs font-bold text-sky-600">
                 {today.label} {formatDateLabel(today.date)}
@@ -105,7 +105,7 @@ export default function WeatherTable({ days }: Props) {
               <td
                 key={day.date}
                 colSpan={FUTURE_HOURS.length}
-                className="text-center py-1.5 bg-indigo-50/40"
+                className="text-center py-1.5 bg-indigo-50"
               >
                 <span className="text-xs font-bold text-indigo-500">
                   {day.label} {formatDateLabel(day.date)}
@@ -127,7 +127,7 @@ export default function WeatherTable({ days }: Props) {
             {futureDays.map((day, i) => [
               <Divider key={`tdiv-${i}`} />,
               ...FUTURE_HOURS.map((h) => (
-                <td key={`${day.date}-${h}`} className="py-1.5 text-center bg-slate-50/60" style={{ minWidth: '56px' }}>
+                <td key={`${day.date}-${h}`} className="py-1.5 text-center bg-slate-50" style={{ minWidth: '56px' }}>
                   <span className="text-xs font-bold text-indigo-400 bg-indigo-50 px-1.5 py-0.5 rounded-md">
                     {h.slice(0, 2)}시
                   </span>

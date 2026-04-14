@@ -79,5 +79,5 @@ main, header, footer {
 
 /* ── 테이블 행 hover ── */
 .weather-row:hover td {
-  background: rgba(219, 234, 254, 0.35);
+  background: #dbeafe !important;
 }
