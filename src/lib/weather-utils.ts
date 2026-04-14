@@ -68,6 +68,15 @@ export function formatQueryTime(date: Date, isNextDay: boolean): string {
   return `${y}년 ${m}월 ${d}일(${day}) ${hh}:${mm} 조회${nextDayLabel}`;
 }
 
+export function addDaysToDate(dateStr: string, days: number): string {
+  const y = parseInt(dateStr.slice(0, 4));
+  const m = parseInt(dateStr.slice(4, 6)) - 1;
+  const d = parseInt(dateStr.slice(6, 8));
+  const date = new Date(y, m, d);
+  date.setDate(date.getDate() + days);
+  return formatDate(date);
+}
+
 export function parsePcp(pcp: string): string {
   if (!pcp || pcp === '강수없음') return '-';
   if (pcp.includes('미만')) {

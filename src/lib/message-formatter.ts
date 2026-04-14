@@ -1,6 +1,8 @@
 import { DashboardData, HourlyForecast, WeatherAlert } from '@/types/weather';
 import { getWeatherIcon, parsePcp } from './weather-utils';
 
+const MESSAGE_HOURS = ['0600', '0900', '1200', '1500', '1800'];
+
 function formatDateHeader(baseDate: string, isNextDay: boolean): string {
   const y = parseInt(baseDate.slice(0, 4));
   const m = parseInt(baseDate.slice(4, 6));
@@ -45,11 +47,14 @@ export function formatDailyForecast(data: DashboardData, alerts: WeatherAlert[])
   for (const region of data.regions) {
     if (region.regionId !== 'gonjiam' && region.regionId !== 'sanbuk') continue;
 
+    const todayForecasts = (region.days[0]?.forecasts ?? [])
+      .filter(fc => MESSAGE_HOURS.includes(fc.time));
+
     lines.push('');
     lines.push(`[${region.regionName}]`);
-    lines.push(formatRainSummary(region.forecasts));
+    lines.push(formatRainSummary(todayForecasts));
 
-    for (const fc of region.forecasts) {
+    for (const fc of todayForecasts) {
       const { alt } = getWeatherIcon(fc.sky, fc.pty);
       const hour = `${fc.time.slice(0, 2)}:00`;
       const pcp = parsePcp(fc.pcp);
@@ -57,6 +62,9 @@ export function formatDailyForecast(data: DashboardData, alerts: WeatherAlert[])
       lines.push(`  ${hour}  ${alt}  기온 ${fc.tmp}°C${pcpPart}`);
     }
   }
+
+  lines.push('');
+  lines.push('※ 자세히 보기 : https://weather.exroad.life (클릭!)');
 
   return lines.join('\n');
 }

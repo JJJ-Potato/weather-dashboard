@@ -1,13 +1,13 @@
-import { HourlyForecast } from '@/types/weather';
+import { DayForecast } from '@/types/weather';
 import WeatherTable from './WeatherTable';
 
 interface Props {
   regionName: string;
   sections: string;
-  forecasts: HourlyForecast[];
+  days: DayForecast[];
+  accentIndex?: number;
 }
 
-// 카드마다 다른 상단 액센트 색상
 const ACCENT_COLORS = [
   'from-blue-400 to-sky-400',
   'from-sky-400 to-cyan-400',
@@ -15,10 +15,8 @@ const ACCENT_COLORS = [
   'from-cyan-400 to-teal-400',
 ];
 
-let cardIndex = 0;
-
-export default function WeatherCard({ regionName, sections, forecasts }: Props) {
-  const accent = ACCENT_COLORS[cardIndex++ % ACCENT_COLORS.length];
+export default function WeatherCard({ regionName, sections, days, accentIndex = 0 }: Props) {
+  const accent = ACCENT_COLORS[accentIndex % ACCENT_COLORS.length];
 
   return (
     <div className="glass-card overflow-hidden">
@@ -38,7 +36,7 @@ export default function WeatherCard({ regionName, sections, forecasts }: Props) 
         {/* 구분선 */}
         <div className="h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent mb-3" />
 
-        <WeatherTable forecasts={forecasts} />
+        <WeatherTable days={days} />
       </div>
     </div>
   );

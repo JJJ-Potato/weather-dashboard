@@ -7,7 +7,10 @@ export const REGIONS = [
 
 export type RegionId = typeof REGIONS[number]['id'];
 
-export const FORECAST_HOURS = ['0600', '0900', '1200', '1500', '1800'] as const;
+export const FORECAST_HOURS = [
+  '0600', '0700', '0800', '0900', '1000', '1100',
+  '1200', '1300', '1400', '1500', '1600', '1700', '1800',
+] as const;
 
 export const ALERT_REGION_KEYWORDS = ['광주', '여주', '이천', '경기도'];
 

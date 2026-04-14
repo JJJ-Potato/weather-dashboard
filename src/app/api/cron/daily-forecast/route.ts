@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { REGIONS } from '@/lib/constants';
-import { fetchForecastByDate, fetchAlerts } from '@/lib/kma-api';
-import { getBaseTime, getForecastDate, formatQueryTime } from '@/lib/weather-utils';
+import { fetchForecastDays, fetchAlerts } from '@/lib/kma-api';
+import { getBaseTime, getForecastDate, formatQueryTime, addDaysToDate } from '@/lib/weather-utils';
 import { formatDailyForecast } from '@/lib/message-formatter';
 import { sendTelegramMessage } from '@/lib/telegram';
 import { DashboardData } from '@/types/weather';
@@ -13,7 +13,6 @@ function getKstNow(): Date {
 }
 
 export async function GET(request: NextRequest) {
-  // CRON_SECRET 인증
   const authHeader = request.headers.get('authorization');
   if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -25,21 +24,30 @@ export async function GET(request: NextRequest) {
     const { forecastDate, isNextDay } = getForecastDate(now);
     const queryTime = formatQueryTime(now, isNextDay);
 
+    const dayLabels = isNextDay
+      ? ['내일', '모레', '글피']
+      : ['오늘', '내일', '모레'];
+
+    const forecastDays = dayLabels.map((label, i) => ({
+      date: addDaysToDate(forecastDate, i),
+      label,
+    }));
+
     const [regionForecasts, alerts] = await Promise.all([
       Promise.all(
         REGIONS.map(async (region) => {
-          const forecasts = await fetchForecastByDate(
+          const days = await fetchForecastDays(
             region.nx,
             region.ny,
             baseDate,
             baseTime,
-            forecastDate
+            forecastDays
           );
           return {
             regionId: region.id,
             regionName: region.name,
             sections: region.sections,
-            forecasts,
+            days,
           };
         })
       ),

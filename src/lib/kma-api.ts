@@ -1,4 +1,4 @@
-import { HourlyForecast, WeatherAlert } from '@/types/weather';
+import { HourlyForecast, DayForecast, WeatherAlert } from '@/types/weather';
 import {
   KMA_FORECAST_URL,
   KMA_ALERT_URL,
@@ -80,7 +80,7 @@ export async function fetchForecast(
         sky: parseInt(vals['SKY'] ?? '1'),
         pty: parseInt(vals['PTY'] ?? '0'),
         tmp: parseInt(vals['TMP'] ?? '0'),
-        pop: parseInt(vals['POP'] ?? '0'),
+        pop: vals['POP'] !== undefined ? parseInt(vals['POP']) : null,
         pcp: vals['PCP'] ?? '강수없음',
         reh: parseInt(vals['REH'] ?? '0'),
       });
@@ -155,7 +155,7 @@ export async function fetchForecastByDate(
         sky: parseInt(vals['SKY'] ?? '1'),
         pty: parseInt(vals['PTY'] ?? '0'),
         tmp: parseInt(vals['TMP'] ?? '0'),
-        pop: parseInt(vals['POP'] ?? '0'),
+        pop: vals['POP'] !== undefined ? parseInt(vals['POP']) : null,
         pcp: vals['PCP'] ?? '강수없음',
         reh: parseInt(vals['REH'] ?? '0'),
       });
@@ -164,6 +164,87 @@ export async function fetchForecastByDate(
     return forecasts;
   } catch (err) {
     console.error('fetchForecastByDate error:', err);
+    return [];
+  }
+}
+
+export async function fetchForecastDays(
+  nx: number,
+  ny: number,
+  baseDate: string,
+  baseTime: string,
+  forecastDays: Array<{ date: string; label: string }>
+): Promise<DayForecast[]> {
+  try {
+    const apiKey = process.env.KMA_API_KEY;
+    if (!apiKey) {
+      console.error('KMA_API_KEY is not set');
+      return [];
+    }
+
+    const params = new URLSearchParams({
+      serviceKey: apiKey,
+      numOfRows: '3000',
+      pageNo: '1',
+      dataType: 'JSON',
+      base_date: baseDate,
+      base_time: baseTime,
+      nx: String(nx),
+      ny: String(ny),
+    });
+
+    const url = `${KMA_FORECAST_URL}?${params.toString()}`;
+    const res = await fetch(url, { cache: 'no-store' });
+
+    if (!res.ok) {
+      console.error(`KMA forecast API error: ${res.status}`);
+      return [];
+    }
+
+    const json = await res.json();
+    const items: KmaItem[] = json?.response?.body?.items?.item ?? [];
+
+    if (!Array.isArray(items) || items.length === 0) {
+      console.error('KMA forecast: empty items', JSON.stringify(json).slice(0, 200));
+      return [];
+    }
+
+    const targetDates = new Set(forecastDays.map((d) => d.date));
+
+    // date -> time -> category -> value
+    const dateMap: Record<string, Record<string, Partial<Record<string, string>>>> = {};
+
+    for (const item of items) {
+      if (!targetDates.has(item.fcstDate)) continue;
+      if (!FORECAST_HOURS.includes(item.fcstTime as typeof FORECAST_HOURS[number])) continue;
+      if (!dateMap[item.fcstDate]) dateMap[item.fcstDate] = {};
+      if (!dateMap[item.fcstDate][item.fcstTime]) dateMap[item.fcstDate][item.fcstTime] = {};
+      dateMap[item.fcstDate][item.fcstTime][item.category] = item.fcstValue;
+    }
+
+    return forecastDays.map(({ date, label }) => {
+      const timeMap = dateMap[date] ?? {};
+      const forecasts: HourlyForecast[] = [];
+
+      for (const hour of FORECAST_HOURS) {
+        const vals = timeMap[hour];
+        if (!vals) continue;
+
+        forecasts.push({
+          time: hour,
+          sky: parseInt(vals['SKY'] ?? '1'),
+          pty: parseInt(vals['PTY'] ?? '0'),
+          tmp: parseInt(vals['TMP'] ?? '0'),
+          pop: vals['POP'] !== undefined ? parseInt(vals['POP']) : null,
+          pcp: vals['PCP'] ?? '강수없음',
+          reh: parseInt(vals['REH'] ?? '0'),
+        });
+      }
+
+      return { date, label, forecasts };
+    });
+  } catch (err) {
+    console.error('fetchForecastDays error:', err);
     return [];
   }
 }
