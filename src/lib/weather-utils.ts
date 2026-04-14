@@ -65,7 +65,7 @@ export function formatQueryTime(date: Date, isNextDay: boolean): string {
   const hh = String(date.getHours()).padStart(2, '0');
   const mm = String(date.getMinutes()).padStart(2, '0');
   const nextDayLabel = isNextDay ? ' [내일예보]' : '';
-  return `${y}년 ${m}월 ${d}일(${day}) ${hh}:${mm} 조회${nextDayLabel}`;
+  return `${y}.${m}.${d}.(${day}) ${hh}:${mm}${nextDayLabel}`;
 }
 
 export function addDaysToDate(dateStr: string, days: number): string {
