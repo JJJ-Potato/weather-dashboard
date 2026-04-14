@@ -126,7 +126,7 @@ export default function DashboardPage() {
                     <p className="text-slate-400 text-xs">{info.sections}</p>
                   </div>
                 </div>
-                <span className="text-xs text-sky-500 font-semibold group-hover:text-sky-600 bg-sky-50 px-3 py-1.5 rounded-lg">
+                <span className="text-[18px] text-blue-600 font-semibold group-hover:text-sky-600 bg-sky-50 px-3 py-1.5 rounded-[175px]">
                   날씨 조회
                 </span>
               </button>

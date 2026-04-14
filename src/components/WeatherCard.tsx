@@ -27,9 +27,11 @@ export default function WeatherCard({ regionName, sections, days, accentIndex = 
         {/* 카드 헤더 */}
         <div className="flex items-center gap-2 mb-3">
           <span className="text-base">📍</span>
-          <div>
+          <div className="flex items-baseline gap-2 min-w-0">
             <h2 className="font-bold text-slate-800 text-sm leading-tight">{regionName}</h2>
-            <span className="text-slate-400 text-xs">{sections}</span>
+            <span className="text-slate-500 text-xs leading-tight bg-slate-100 px-1.5 py-0.5 rounded-md whitespace-nowrap">
+              {sections}
+            </span>
           </div>
         </div>
 

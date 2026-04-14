@@ -11,7 +11,7 @@ export default function Header({ queryTime, isNextDay }: Props) {
 
       {/* 제목 */}
       <h1
-        className="text-2xl font-bold tracking-tight"
+        className="text-[27px] font-bold tracking-tight"
         style={{
           background: 'linear-gradient(135deg, #1e40af 0%, #0369a1 50%, #0e7490 100%)',
           WebkitBackgroundClip: 'text',
@@ -21,7 +21,7 @@ export default function Header({ queryTime, isNextDay }: Props) {
       >
         수도권 제2순환선(양평-이천)
       </h1>
-      <p className="text-base font-semibold text-sky-700 mt-0.5 tracking-wide">
+      <p className="text-[20px] font-semibold text-sky-700 mt-0.5 tracking-wide">
         현장 날씨 현황
       </p>
 
@@ -30,7 +30,7 @@ export default function Header({ queryTime, isNextDay }: Props) {
 
       {/* 조회시간 */}
       <div className="flex items-center justify-center gap-2">
-        <span className="text-xs text-slate-500">{queryTime}</span>
+        <span className="text-[17px] text-blue-600">{queryTime}</span>
         {isNextDay && (
           <span className="bg-gradient-to-r from-blue-500 to-sky-500 text-white text-xs px-2.5 py-0.5 rounded-full font-semibold shadow-sm">
             내일

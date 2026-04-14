@@ -85,7 +85,12 @@ export default function WeatherTable({ days }: Props) {
 
           {/* ── 날짜 그룹 헤더 ── */}
           <tr className="border-b-2 border-slate-200">
-            <td className="sticky left-0 bg-white/90 backdrop-blur-sm z-10" style={{ width: '52px', minWidth: '52px' }} />
+            <td
+              className={`${LABEL_STYLE} text-center pl-0`}
+              style={{ width: '52px', minWidth: '52px' }}
+            >
+              일자
+            </td>
             {/* 오늘 */}
             <td
               colSpan={TODAY_HOURS.length}
@@ -111,7 +116,7 @@ export default function WeatherTable({ days }: Props) {
 
           {/* ── 시간 헤더 ── */}
           <tr className={ROW_BASE}>
-            <td className={LABEL_STYLE} style={{ width: '52px', minWidth: '52px' }}></td>
+            <td className={LABEL_STYLE} style={{ width: '52px', minWidth: '52px' }}>시간</td>
             {TODAY_HOURS.map((h) => (
               <td key={h} className="py-1.5 text-center" style={{ minWidth: '40px' }}>
                 <span className="text-xs font-bold text-sky-600 bg-sky-50 px-1 py-0.5 rounded-md">
